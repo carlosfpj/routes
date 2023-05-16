@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
+
+const adminList = ['Irisval', 'RetaxMaster', 'freddier'];
 
 const AuthContext = React.createContext();
 
@@ -10,7 +12,8 @@ function AuthProvider({children}) {
   const [user, setUser] = useState(null);
 
   const login = ({username}) => {
-    setUser({username});
+    const isAdmin = adminList.find(admin => admin === username)
+    setUser({username, isAdmin});
     navigate("/profile");
   };
 
@@ -18,6 +21,7 @@ function AuthProvider({children}) {
     setUser(null);
     navigate("/");
   };
+
   const auth = {user, login, logout};
 
   return (
@@ -32,7 +36,20 @@ function useAuth() {
   return auth;
 }
 
+function AuthRoute(props) {
+  const auth = useAuth();
+  const navigate2 = useNavigate();
+
+  if (!auth.user) {
+    return navigate2('/profile');
+    // return <Navigate to="/login" />;
+  }
+
+  return props.children;
+}
+
 export {
   AuthProvider,
   useAuth,
+  AuthRoute,
 };
